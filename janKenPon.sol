@@ -38,8 +38,12 @@ contract SimpleJKP {
     // contains "ready to reset game" flag for _player][_other_player] (both must accept game reset)
     mapping (address => mapping (address => bool)) ready_for_reset;
     
-    function reset_game(address _other_player_address) public returns (bool success) {
+    modifier onlyIfBothResetReady(address _other_player_address) {
         require(ready_for_reset[msg.sender][_other_player_address] && ready_for_reset[_other_player_address][msg.sender], "One of the opponents haven't finish current game (check result). Finish current game first!");
+        _;
+    }
+    
+    function reset_game(address _other_player_address) public onlyIfBothResetReady(_other_player_address) returns (bool success) {
         ready_for_reset[msg.sender][_other_player_address] = false;
         ready_for_reset[_other_player_address][msg.sender] = false;
         choise_hashes[msg.sender][_other_player_address] = 0;
