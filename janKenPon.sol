@@ -1,6 +1,26 @@
 pragma solidity ^0.8.7;
 
-contract SimpleJKP {
+contract Ownable {
+
+    address owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+ 
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+    
+    function transferOwnership(address newOwner) public onlyOwner {
+	    owner = newOwner;
+    }
+    
+
+}
+
+contract SimpleJKP is Ownable {
     // Choices enum
     enum Choice {
         None,
@@ -38,9 +58,14 @@ contract SimpleJKP {
     // contains "ready to reset game" flag for _player][_other_player] (both must accept game reset)
     mapping (address => mapping (address => bool)) ready_for_reset;
     
+    
     modifier onlyIfBothResetReady(address _other_player_address) {
         require(ready_for_reset[msg.sender][_other_player_address] && ready_for_reset[_other_player_address][msg.sender], "One of the opponents haven't finish current game (check result). Finish current game first!");
         _;
+    }
+    
+    function check_creator() public view onlyOwner returns (bool success) {
+        return true;
     }
     
     function reset_game(address _other_player_address) public onlyIfBothResetReady(_other_player_address) returns (bool success) {
