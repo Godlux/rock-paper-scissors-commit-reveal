@@ -70,6 +70,9 @@ contract SimpleJKP {
         require(choises[_other_player_address][msg.sender] != Choice.None, "Your opponent have to reval his choise first!");
         GameState game_result = endgame_states[choises[msg.sender][_other_player_address]][choises[_other_player_address][msg.sender]];
         ready_for_reset[msg.sender][_other_player_address] = true;
+        emit EndGame(msg.sender, _other_player_address, uint8(game_result));
         return uint8(game_result);
     }
+    
+    event EndGame(address indexed _from, address indexed _to, uint8 _result);
 }
